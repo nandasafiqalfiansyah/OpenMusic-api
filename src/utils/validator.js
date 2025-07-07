@@ -1,5 +1,28 @@
 const Joi = require('joi');
 
+const UserPayloadSchema = Joi.object({
+  username: Joi.string().required(),
+  password: Joi.string().required(),
+  fullname: Joi.string().required(),
+});
+
+const AuthPayloadSchema = Joi.object({
+  username: Joi.string().required(),
+  password: Joi.string().required(),
+});
+
+const RefreshTokenPayloadSchema = Joi.object({
+  refreshToken: Joi.string().required(),
+});
+
+const PlaylistPayloadSchema = Joi.object({
+  name: Joi.string().required(),
+});
+
+const PlaylistSongPayloadSchema = Joi.object({
+  songId: Joi.string().required(),
+});
+
 const AlbumPayloadSchema = Joi.object({
   name: Joi.string().min(1).required().messages({
     'any.required': 'Album name is required',
@@ -27,4 +50,12 @@ const SongPayloadSchema = Joi.object({
   albumId: Joi.string(),
 });
 
-module.exports = { AlbumPayloadSchema, SongPayloadSchema };
+module.exports = {
+  AlbumPayloadSchema,
+  SongPayloadSchema,
+  UserPayloadSchema,
+  AuthPayloadSchema,
+  RefreshTokenPayloadSchema,
+  PlaylistPayloadSchema,
+  PlaylistSongPayloadSchema,
+};

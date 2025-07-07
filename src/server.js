@@ -1,7 +1,11 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 const albums = require('./routes/albums');
 const songs = require('./routes/songs');
+const users = require('./routes/users');
+const authenticationsRoutes = require('./routes/authentications');
+const playlistsRoutes = require('./routes/playlists');
 const ClientError = require('./utils/error/ClientError');
 
 const init = async () => {
@@ -15,9 +19,36 @@ const init = async () => {
     },
   });
 
-  server.route(albums);
-  server.route(songs);
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
 
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  });
+
+  // Register routes
+  server.route([
+    ...albums,
+    ...songs,
+    ...users,
+    ...authenticationsRoutes,
+    ...playlistsRoutes,
+  ]);
   // 🛠 Tangani custom error
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;

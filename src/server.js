@@ -62,11 +62,22 @@ const init = async () => {
         .code(response.statusCode);
     }
 
+    //  tambahkan unauthorized error handling
+    if (response.isBoom && response.output.statusCode === 401) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Unauthorized',
+        })
+        .code(401);
+    }
+
     if (response instanceof Error) {
       return h
         .response({
           status: 'error',
-          message: 'Maaf, terjadi kegagalan pada server kami.',
+          message:
+            'Maaf, terjadi kegagalan pada server kami.' + response.message,
         })
         .code(500);
     }

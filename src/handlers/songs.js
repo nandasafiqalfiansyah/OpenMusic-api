@@ -34,8 +34,6 @@ const postSongHandler = async (request, h) => {
         })
         .code(error.statusCode);
     }
-    console.log(error);
-
     // Server error
     return h
       .response({

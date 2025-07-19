@@ -1,5 +1,4 @@
 const ClientError = require('../utils/error/ClientError');
-
 class PlaylistsHandler {
   constructor(playlistsService, validator) {
     this._playlistsService = playlistsService;
@@ -22,8 +21,6 @@ class PlaylistsHandler {
       const { name } = request.payload;
       const { id: credentialId } = request.auth.credentials;
 
-      console.log(request.payload);
-
       const playlistId = await this._playlistsService.addPlaylist({
         name,
         owner: credentialId,
@@ -38,7 +35,6 @@ class PlaylistsHandler {
         })
         .code(201);
     } catch (error) {
-      console.log(error);
       if (error instanceof ClientError) {
         return h
           .response({
@@ -62,7 +58,6 @@ class PlaylistsHandler {
     try {
       const { id: credentialId } = request.auth.credentials;
       const playlists = await this._playlistsService.getPlaylists(credentialId);
-
       return h.response({
         status: 'success',
         data: {
@@ -123,12 +118,9 @@ class PlaylistsHandler {
 
   async postSongToPlaylistHandler(request, h) {
     try {
-      console.log(request.payload);
-      this._validator.validatePlaylistSongPayload(request.payload);
       const { songId } = request.payload;
       const { id } = request.params;
       const { id: credentialId } = request.auth.credentials;
-
       await this._playlistsService.verifyPlaylistAccess(id, credentialId);
       await this._playlistsService.addSongToPlaylist(id, songId);
       await this._playlistsService.addActivity(id, songId, credentialId, 'add');
@@ -140,6 +132,7 @@ class PlaylistsHandler {
         })
         .code(201);
     } catch (error) {
+      console.log(error);
       if (error instanceof ClientError) {
         return h
           .response({
@@ -200,12 +193,10 @@ class PlaylistsHandler {
       const { id: credentialId } = request.auth.credentials;
 
       await this._playlistsService.verifyPlaylistAccess(id, credentialId);
-      await this._playlistsService.deleteSongFromPlaylist(id, songId);
-      await this._playlistsService.addActivity(
+      await this._playlistsService.deleteSongFromPlaylist(
         id,
         songId,
-        credentialId,
-        'delete'
+        credentialId
       );
 
       return h.response({
@@ -213,6 +204,7 @@ class PlaylistsHandler {
         message: 'Lagu berhasil dihapus dari playlist',
       });
     } catch (error) {
+      console.log(error);
       if (error instanceof ClientError) {
         return h
           .response({
@@ -226,7 +218,7 @@ class PlaylistsHandler {
       return h
         .response({
           status: 'error',
-          message: 'Maaf, terjadi kegagalan pada server kami.',
+          message: 'Maaf, terjadi kegagalan pada server kami.' + error.message,
         })
         .code(500);
     }

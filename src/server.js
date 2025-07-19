@@ -61,6 +61,15 @@ const init = async () => {
         })
         .code(response.statusCode);
     }
+    //  tambahkan jika 403 error handling
+    if (response.isBoom && response.output.statusCode === 403) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Forbidden',
+        })
+        .code(403);
+    }
 
     //  tambahkan unauthorized error handling
     if (response.isBoom && response.output.statusCode === 401) {

@@ -88,6 +88,16 @@ const routes = [
       auth: 'openmusic_jwt',
     },
   },
+
+  //Ekspor Lagu Pada Playlist
+  {
+    method: 'POST',
+    path: '/export/playlists/{id}',
+    handler: playlistsHandler.exportSongsFromPlaylistHandler,
+    options: {
+      auth: 'openmusic_jwt',
+    },
+  },
 ];
 
 module.exports = routes;

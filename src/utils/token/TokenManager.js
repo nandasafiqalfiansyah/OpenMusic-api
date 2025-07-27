@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const InvariantError = require('../../utils/error/InvariantError');
-
 class TokenManager {
   constructor() {
     this._accessTokenKey = process.env.ACCESS_TOKEN_KEY;

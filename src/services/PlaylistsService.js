@@ -3,6 +3,7 @@ const { nanoid } = require('nanoid');
 const InvariantError = require('../utils/error/InvariantError');
 const NotFoundError = require('../utils/error/NotFoundError');
 const AuthorizationError = require('../utils/error/AuthorizationError');
+const { getChannel } = require('../utils/rabbitmq');
 
 class PlaylistsService {
   constructor(collaborationsService) {
@@ -205,6 +206,24 @@ class PlaylistsService {
     }
     return result.rows;
   }
+
+  async sendExportPlaylistRequest({ playlistId, targetEmail }) {
+  const channel = await getChannel();
+
+  const message = {
+    playlistId,
+    targetEmail,
+  };
+
+  await channel.assertQueue('export:playlist', {
+    durable: true,
+  });
+
+  channel.sendToQueue(
+    'export:playlist',
+    Buffer.from(JSON.stringify(message))
+  );
+}
 }
 
 module.exports = PlaylistsService;

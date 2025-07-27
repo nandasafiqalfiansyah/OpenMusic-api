@@ -1,4 +1,5 @@
 const ClientError = require('../utils/error/ClientError');
+
 class PlaylistsHandler {
   constructor(playlistsService, validator) {
     this._playlistsService = playlistsService;
@@ -14,6 +15,8 @@ class PlaylistsHandler {
       this.deleteSongFromPlaylistHandler.bind(this);
     this.getPlaylistActivitiesHandler =
       this.getPlaylistActivitiesHandler.bind(this);
+    this.exportSongsFromPlaylistHandler =
+      this.exportSongsFromPlaylistHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -132,7 +135,6 @@ class PlaylistsHandler {
         })
         .code(201);
     } catch (error) {
-      console.log(error);
       if (error instanceof ClientError) {
         return h
           .response({
@@ -204,7 +206,6 @@ class PlaylistsHandler {
         message: 'Lagu berhasil dihapus dari playlist',
       });
     } catch (error) {
-      console.log(error);
       if (error instanceof ClientError) {
         return h
           .response({
@@ -229,6 +230,7 @@ class PlaylistsHandler {
       const { id } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
+      console.log(credentialId);
       await this._playlistsService.verifyPlaylistAccess(id, credentialId);
       const activities = await this._playlistsService.getActivities(id);
 
@@ -240,6 +242,7 @@ class PlaylistsHandler {
         },
       });
     } catch (error) {
+      console.log(error);
       if (error instanceof ClientError) {
         return h
           .response({
@@ -254,6 +257,56 @@ class PlaylistsHandler {
         .response({
           status: 'error',
           message: 'Maaf, terjadi kegagalan pada server kami.',
+        })
+        .code(500);
+    }
+  }
+
+  async exportSongsFromPlaylistHandler(request, h) {
+    try {
+      const { id: playlistId } = request.params;
+      const { targetEmail } = request.payload;
+
+      if (!targetEmail) {
+        return h
+          .response({
+            status: 'fail',
+            message: 'Email tujuan harus diisi',
+          })
+          .code(400);
+      }
+      const { id: credentialId } = request.auth.credentials;
+      await this._playlistsService.verifyPlaylistAccess(
+        playlistId,
+        credentialId
+      );
+
+      await this._playlistsService.sendExportPlaylistRequest({
+        playlistId,
+        targetEmail,
+      });
+
+      return h
+        .response({
+          status: 'success',
+          message: 'Permintaan Anda sedang kami proses',
+        })
+        .code(201);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof ClientError) {
+        return h
+          .response({
+            status: 'fail',
+            message: error.message,
+          })
+          .code(error.statusCode);
+      }
+
+      return h
+        .response({
+          status: 'error',
+          message: 'Maaf, terjadi kegagalan pada server kami.' + error.message,
         })
         .code(500);
     }

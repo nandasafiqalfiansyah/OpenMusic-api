@@ -3,7 +3,6 @@ const { nanoid } = require('nanoid');
 const InvariantError = require('../utils/error/InvariantError');
 const AuthenticationError = require('../utils/error/AuthenticationError');
 const bcrypt = require('bcrypt');
-
 class AuthenticationsService {
   constructor() {
     this._pool = new Pool();

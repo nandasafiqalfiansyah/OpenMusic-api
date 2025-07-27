@@ -50,6 +50,16 @@ const SongPayloadSchema = Joi.object({
   albumId: Joi.string(),
 });
 
+const CollaborationPayloadSchema = Joi.object({
+  playlistId: Joi.string().required(),
+  userId: Joi.string().required(),
+});
+
+const AlbumCoverPayloadSchema = Joi.object({
+  //  validati harus berupa  image /png/jpg
+  cover: Joi.any().required(), //
+});
+
 module.exports = {
   AlbumPayloadSchema,
   SongPayloadSchema,
@@ -58,4 +68,6 @@ module.exports = {
   RefreshTokenPayloadSchema,
   PlaylistPayloadSchema,
   PlaylistSongPayloadSchema,
+  CollaborationPayloadSchema,
+  AlbumCoverPayloadSchema,
 };
